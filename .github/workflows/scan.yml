@@ -1,0 +1,44 @@
+name: Scan SBOMs
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 3 AM EST
+
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch our SBOMs from the workflow artifacts
+      - name: Download build SBOM
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build.yml
+          name: sbom-summit-build.spdx.json
+
+      - name: Download container SBOM
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build.yml
+          name: sbom-summit.spdx.json
+
+      - run: ls -alFh
+
+      # scan the build-time sbom
+      - uses: anchore/scan-action@v3
+        id: scan-build-sbom
+        continue-on-error: true
+        with:
+          sbom: sbom-summit-build.spdx.json
+
+      - run: cat ${{ steps.scan-build-sbom.outputs.sarif }} | jq -r '.runs[0].tool.driver.rules[].shortDescription.text'
+
+      # scan the container sbom
+      - uses: anchore/scan-action@v3
+        id: scan-sbom
+        continue-on-error: true
+        with:
+          sbom: sbom-summit.spdx.json
+
+      - run: cat ${{ steps.scan-sbom.outputs.sarif }} | jq -r '.runs[0].tool.driver.rules[].shortDescription.text'

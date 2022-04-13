@@ -1,0 +1,25 @@
+{
+  "name": "sbom-summit",
+  "version": "1.0.0",
+  "description": "An example project with SBOM workflows",
+  "main": "index.js",
+  "scripts": {
+    "package": "mkdir -p dist && rollup src/index.js > dist/index.js && cp src/index.html dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kzantow-anchore/sbom-summit.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kzantow-anchore/sbom-summit/issues"
+  },
+  "homepage": "https://github.com/kzantow-anchore/sbom-summit#readme",
+  "dependencies": {
+    "url-parse": "^1.5.1"
+  },
+  "devDependencies": {
+    "rollup": "^2.70.1"
+  }
+}

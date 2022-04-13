@@ -1,0 +1,30 @@
+name: Build App and Container
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: npm ci
+
+      # get the build-time sbom from our package-lock.json
+      - uses: anchore/sbom-action@v0
+        with:
+          artifact-name: sbom-summit-build.spdx.json
+
+      # build our distribution and container
+      - run: npm run package
+      - run: docker build -t sbom-summit:latest .
+
+      # get the container sbom
+      - uses: anchore/sbom-action@v0
+        with:
+          image: sbom-summit:latest
+          artifact-name: sbom-summit.spdx.json
